@@ -10,6 +10,9 @@ import (
 func DBMigrator(db *gorm.DB) error {
 	entities := []interface{}{
 		&entity.User{},
+		&entity.Menu{},
+		&entity.Cart{},
+		&entity.Order{},
 	}
 	for _, entity := range entities {
 		if err := db.Migrator().DropTable(entity); err != nil {
