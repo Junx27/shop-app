@@ -17,6 +17,7 @@ func main() {
 	authService := service.NewAuthService(authRepository)
 	router.SetupAuthRouter(r, authService.(*service.AuthService))
 	router.SetupUserRouter(r, db)
+	router.SetupMenuRouter(r, db)
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"App Name": "Shop App",

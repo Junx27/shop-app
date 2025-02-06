@@ -6,6 +6,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
+      - ./uploads:/app/uploads:rw
     env_file:
       - .env
     depends_on:
