@@ -12,6 +12,12 @@ func (BaseModelCart) TableName() string {
 	return "carts"
 }
 
+type CalculateCart struct {
+	TotalItems    int     `json:"total_item"`
+	TotalQuantity int     `json:"total_quantity"`
+	TotalPrice    float64 `json:"total_price"`
+}
+
 type Cart struct {
 	BaseModelCart
 	ID       uint   `json:"id" gorm:"primaryKey"`
@@ -40,10 +46,12 @@ type CartRepository interface {
 	UpdateQuantity(ctx context.Context, id uint, operation string, qty int) error
 	DeleteOne(ctx context.Context, id uint) error
 	FindByUserAndMenu(ctx context.Context, userID uint, menuID uint) (*Cart, error)
+	GetManyByUserAndStatus(ctx context.Context, userID uint, status string) ([]*Cart, error)
 	UpdateOne(ctx context.Context, cart *Cart) (*Cart, error)
 }
 
 type CartService interface {
 	DecreaseCart(ctx context.Context, id uint, qty int) error
 	IncreaseCart(ctx context.Context, id uint, qty int) error
+	CalculatePrice(ctx context.Context, userID uint, status string) (*CalculateCart, error)
 }

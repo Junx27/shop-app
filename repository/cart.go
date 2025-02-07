@@ -33,21 +33,25 @@ func (r *CartRepository) GetOne(ctx context.Context, id uint) (*entity.Cart, err
 	return cart, nil
 }
 
-// FindByUserAndMenu checks if a cart with the same user and menu already exists.
 func (r *CartRepository) FindByUserAndMenu(ctx context.Context, userID uint, menuID uint) (*entity.Cart, error) {
 	cart := &entity.Cart{}
 	if err := r.db.Where("user_id = ? AND menu_id = ?", userID, menuID).First(&cart).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			// Return nil if no cart found
 			return nil, nil
 		}
-		// Return any other error
 		return nil, err
 	}
 	return cart, nil
 }
 
-// UpdateOne updates the cart in the database.
+func (r *CartRepository) GetManyByUserAndStatus(ctx context.Context, userID uint, status string) ([]*entity.Cart, error) {
+	var carts []*entity.Cart
+	if err := r.db.Where("user_id = ? AND status = ?", userID, status).Find(&carts).Error; err != nil {
+		return nil, err
+	}
+	return carts, nil
+}
+
 func (r *CartRepository) UpdateOne(ctx context.Context, cart *entity.Cart) (*entity.Cart, error) {
 	if err := r.db.Save(&cart).Error; err != nil {
 		return nil, err

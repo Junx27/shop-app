@@ -21,6 +21,7 @@ func SetupCartRouter(r *gin.Engine, db *gorm.DB, menuService *service.CalculateS
 		cartGroup.POST("", cartHandler.CreateOne)
 		cartGroup.PUT("/increase/:id", cartHandler.Increase)
 		cartGroup.PUT("/decrease/:id", cartHandler.Decrease)
+		cartGroup.GET("/total", cartHandler.CalculateTotalPrice)
 		cartGroup.DELETE("/:id", cartHandler.DeleteOne)
 	}
 }

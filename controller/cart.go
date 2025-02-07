@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"strconv"
@@ -30,6 +31,24 @@ func (h *CartHandler) GetMany(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, helper.SuccessResponse("Fetch data successfully", carts))
 }
+
+func (h *CartHandler) CalculateTotalPrice(ctx *gin.Context) {
+	userID, err := helper.GetUserIDFromCookie(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+		return
+	}
+	calculation, err := h.cartService.CalculatePrice(ctx, uint(userID), "pending")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse(fmt.Sprintf("Failed to calculate total price: %v", err)))
+		return
+	}
+	ctx.JSON(http.StatusOK, helper.SuccessResponse("Total price calculated successfully", calculation))
+}
+
 func (h *CartHandler) GetOne(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	cart, err := h.repository.GetOne(ctx, uint(id))
@@ -46,8 +65,16 @@ func (h *CartHandler) CreateOne(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid request data"))
 		return
 	}
+	userID, err := helper.GetUserIDFromCookie(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+		return
+	}
 
-	existingCart, err := h.repository.FindByUserAndMenu(ctx, cart.UserID, cart.MenuID)
+	existingCart, err := h.repository.FindByUserAndMenu(ctx, userID, cart.MenuID)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to check existing cart"))
 		return
@@ -84,6 +111,7 @@ func (h *CartHandler) CreateOne(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Please check quantity"))
 		return
 	}
+	cart.UserID = userID
 	cart.Subtotal = subTotal
 	createCart, err := h.repository.CreateOne(ctx, cart)
 	if err != nil {
