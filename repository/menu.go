@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Junx27/shop-app/entity"
 	"gorm.io/gorm"
@@ -66,6 +67,29 @@ func (r *MenuRepository) UpdateOne(ctx context.Context, id uint, updateData map[
 	}
 
 	return menu, nil
+}
+func (r *MenuRepository) UpdateQuantity(ctx context.Context, id uint, operation string, qty int) error {
+
+	menu := &entity.Menu{}
+	if err := r.db.First(&menu, id).Error; err != nil {
+		return err
+	}
+	switch operation {
+	case "increase":
+		menu.Quantity += qty
+	case "decrease":
+		if menu.Quantity > 0 {
+			menu.Quantity -= qty
+		} else {
+			return fmt.Errorf("quantity cannot go below 0")
+		}
+	default:
+		return fmt.Errorf("invalid operation, use 'increase' or 'decrease'")
+	}
+	if err := r.db.Save(&menu).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *MenuRepository) DeleteOne(ctx context.Context, id uint) error {

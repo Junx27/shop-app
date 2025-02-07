@@ -9,15 +9,18 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupCartRouter(r *gin.Engine, db *gorm.DB, menuService *service.CalculateService) {
+func SetupCartRouter(r *gin.Engine, db *gorm.DB, menuService *service.CalculateService, cartService *service.QuantityService) {
 	cartRepository := repository.NewCartRepository(db)
-	cartHandler := controller.NewCartHandler(cartRepository, menuService)
+	cartHandler := controller.NewCartHandler(cartRepository, menuService, cartService)
 
 	cartGroup := r.Group("/carts")
 	cartGroup.Use(middleware.AuthProtected(db))
 	{
+		cartGroup.GET("", cartHandler.GetMany)
 		cartGroup.GET("/:id", cartHandler.GetOne)
 		cartGroup.POST("", cartHandler.CreateOne)
+		cartGroup.PUT("/increase/:id", cartHandler.Increase)
+		cartGroup.PUT("/decrease/:id", cartHandler.Decrease)
 		cartGroup.DELETE("/:id", cartHandler.DeleteOne)
 	}
 }

@@ -22,3 +22,18 @@ func (s *CalculateService) CalculateSubTotal(ctx context.Context, id uint, qty i
 	}
 	return menu.Price * qty, nil
 }
+func (s *CalculateService) DecreaseMenu(ctx context.Context, id uint, qty int) error {
+	err := s.repository.UpdateQuantity(ctx, id, "decrease", qty)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *CalculateService) IncreaseMenu(ctx context.Context, id uint, qty int) error {
+	err := s.repository.UpdateQuantity(ctx, id, "increase", qty)
+	if err != nil {
+		return err
+	}
+	return nil
+}

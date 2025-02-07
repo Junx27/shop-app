@@ -17,7 +17,7 @@ type Menu struct {
 	Category string `json:"category" gorm:"not null"`
 	Quantity int    `json:"quantity" gorm:"not null"`
 	Image    string `json:"image"`
-	User     User   `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	User     User   `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 }
 
 type MenuRepository interface {
@@ -25,9 +25,12 @@ type MenuRepository interface {
 	GetOne(ctx context.Context, id uint) (*Menu, error)
 	CreateOne(ctx context.Context, menu *Menu) (*Menu, error)
 	UpdateOne(ctx context.Context, id uint, updateData map[string]interface{}) (*Menu, error)
+	UpdateQuantity(ctx context.Context, id uint, operation string, qty int) error
 	DeleteOne(ctx context.Context, id uint) error
 }
 
 type MenuService interface {
 	CalculateSubTotal(ctx context.Context, id uint, qty int) (int, error)
+	DecreaseMenu(ctx context.Context, id uint, qty int) error
+	IncreaseMenu(ctx context.Context, id uint, qty int) error
 }
