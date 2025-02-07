@@ -19,6 +19,11 @@ type AuthService struct {
 	repository entity.AuthRepository
 }
 
+func NewAuthService(repository entity.AuthRepository) entity.AuthService {
+	return &AuthService{
+		repository: repository,
+	}
+}
 func (s *AuthService) Login(ctx context.Context, loginData *entity.AuthCredentials) (string, *entity.User, error) {
 	user, err := s.repository.GetUser(ctx, "email = ?", loginData.Email)
 
@@ -88,10 +93,4 @@ func (s *AuthService) Register(ctx context.Context, registerData *entity.User) (
 
 func (s *AuthService) Logout(ctx context.Context, userID string) error {
 	return nil
-}
-
-func NewAuthService(repository entity.AuthRepository) entity.AuthService {
-	return &AuthService{
-		repository: repository,
-	}
 }

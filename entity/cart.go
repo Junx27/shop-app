@@ -1,5 +1,7 @@
 package entity
 
+import "context"
+
 type BaseModelCart struct{}
 
 func (BaseModelCart) TableName() string {
@@ -16,4 +18,10 @@ type Cart struct {
 	Status   string `json:"status" gorm:"default:pending"`
 	Menu     Menu   `json:"menu" gorm:"foreignKey:MenuID;constraint:OnDelete:CASCADE"`
 	User     User   `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+}
+
+type CartRepository interface {
+	GetOne(ctx context.Context, id uint) (*Cart, error)
+	CreateOne(ctx context.Context, cart *Cart) (*Cart, error)
+	DeleteOne(ctx context.Context, id uint) error
 }

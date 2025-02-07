@@ -27,3 +27,7 @@ type MenuRepository interface {
 	UpdateOne(ctx context.Context, id uint, updateData map[string]interface{}) (*Menu, error)
 	DeleteOne(ctx context.Context, id uint) error
 }
+
+type MenuService interface {
+	CalculateSubTotal(ctx context.Context, id uint, qty int) (int, error)
+}

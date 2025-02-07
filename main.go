@@ -15,9 +15,12 @@ func main() {
 	r := gin.Default()
 	authRepository := repository.NewAuthRepository(db)
 	authService := service.NewAuthService(authRepository)
+	menuRepository := repository.NewMenuRepository(db)
+	menuService := service.NewCalculateService(menuRepository)
 	router.SetupAuthRouter(r, authService.(*service.AuthService))
 	router.SetupUserRouter(r, db)
 	router.SetupMenuRouter(r, db)
+	router.SetupCartRouter(r, db, menuService.(*service.CalculateService))
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"App Name": "Shop App",
