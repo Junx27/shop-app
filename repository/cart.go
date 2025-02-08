@@ -33,9 +33,9 @@ func (r *CartRepository) GetOne(ctx context.Context, id uint) (*entity.Cart, err
 	return cart, nil
 }
 
-func (r *CartRepository) FindByUserAndMenu(ctx context.Context, userID uint, menuID uint) (*entity.Cart, error) {
+func (r *CartRepository) FindByUserAndMenuAndStatus(ctx context.Context, userID uint, menuID uint, status string) (*entity.Cart, error) {
 	cart := &entity.Cart{}
-	if err := r.db.Where("user_id = ? AND menu_id = ?", userID, menuID).First(&cart).Error; err != nil {
+	if err := r.db.Where("user_id = ? AND menu_id = ? AND status = ?", userID, menuID, status).First(&cart).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
@@ -50,6 +50,22 @@ func (r *CartRepository) GetManyByUserAndStatus(ctx context.Context, userID uint
 		return nil, err
 	}
 	return carts, nil
+}
+
+func (r *CartRepository) UpdateOrderIDByStatus(ctx context.Context, userID uint, orderID uint) error {
+	carts, err := r.GetManyByUserAndStatus(ctx, userID, "pending")
+	if err != nil {
+		return err
+	}
+	for _, cart := range carts {
+		cart.OrderID = &orderID
+		cart.Status = "checkout"
+		_, err := r.UpdateOne(ctx, cart)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *CartRepository) UpdateOne(ctx context.Context, cart *entity.Cart) (*entity.Cart, error) {

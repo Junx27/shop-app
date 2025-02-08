@@ -45,8 +45,9 @@ type CartRepository interface {
 	CreateOne(ctx context.Context, cart *Cart) (*Cart, error)
 	UpdateQuantity(ctx context.Context, id uint, operation string, qty int) error
 	DeleteOne(ctx context.Context, id uint) error
-	FindByUserAndMenu(ctx context.Context, userID uint, menuID uint) (*Cart, error)
+	FindByUserAndMenuAndStatus(ctx context.Context, userID uint, menuID uint, status string) (*Cart, error)
 	GetManyByUserAndStatus(ctx context.Context, userID uint, status string) ([]*Cart, error)
+	UpdateOrderIDByStatus(ctx context.Context, userID uint, orderID uint) error
 	UpdateOne(ctx context.Context, cart *Cart) (*Cart, error)
 }
 
@@ -54,4 +55,5 @@ type CartService interface {
 	DecreaseCart(ctx context.Context, id uint, qty int) error
 	IncreaseCart(ctx context.Context, id uint, qty int) error
 	CalculatePrice(ctx context.Context, userID uint, status string) (*CalculateCart, error)
+	UpdateOrderIDInPendingCarts(ctx context.Context, userID uint, orderID uint) error
 }

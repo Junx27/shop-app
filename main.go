@@ -22,7 +22,8 @@ func main() {
 	router.SetupAuthRouter(r, authService.(*service.AuthService))
 	router.SetupUserRouter(r, db)
 	router.SetupMenuRouter(r, db)
-	router.SetupCartRouter(r, db, menuService.(*service.CalculateService), cartService.(*service.QuantityService))
+	router.SetupCartRouter(r, db, menuService.(*service.CalculateService), cartService.(*service.CartService))
+	router.SetupOrderRouter(r, db, cartService.(*service.CartService))
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"App Name": "Shop App",

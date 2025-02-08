@@ -74,7 +74,7 @@ func (h *CartHandler) CreateOne(ctx *gin.Context) {
 		return
 	}
 
-	existingCart, err := h.repository.FindByUserAndMenu(ctx, userID, cart.MenuID)
+	existingCart, err := h.repository.FindByUserAndMenuAndStatus(ctx, userID, cart.MenuID, "pending")
 	if err != nil && err != gorm.ErrRecordNotFound {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to check existing cart"))
 		return
@@ -83,7 +83,7 @@ func (h *CartHandler) CreateOne(ctx *gin.Context) {
 		existingCart.Quantity += cart.Quantity
 		subTotal, err := h.menuService.CalculateSubTotal(ctx, cart.MenuID, existingCart.Quantity)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to calculate sub total"))
+			ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Quantity is unavailable"))
 			return
 		}
 		existingCart.Subtotal = subTotal

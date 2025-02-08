@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupCartRouter(r *gin.Engine, db *gorm.DB, menuService *service.CalculateService, cartService *service.QuantityService) {
+func SetupCartRouter(r *gin.Engine, db *gorm.DB, menuService *service.CalculateService, cartService *service.CartService) {
 	cartRepository := repository.NewCartRepository(db)
 	cartHandler := controller.NewCartHandler(cartRepository, menuService, cartService)
 

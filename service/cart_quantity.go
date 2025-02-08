@@ -6,15 +6,15 @@ import (
 	"github.com/Junx27/shop-app/entity"
 )
 
-type QuantityService struct {
+type CartService struct {
 	repository entity.CartRepository
 }
 
 func NewQuantityService(repository entity.CartRepository) entity.CartService {
-	return &QuantityService{repository: repository}
+	return &CartService{repository: repository}
 }
 
-func (s *QuantityService) IncreaseCart(ctx context.Context, id uint, qty int) error {
+func (s *CartService) IncreaseCart(ctx context.Context, id uint, qty int) error {
 	err := s.repository.UpdateQuantity(ctx, id, "increase", qty)
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func (s *QuantityService) IncreaseCart(ctx context.Context, id uint, qty int) er
 	return nil
 }
 
-func (s *QuantityService) DecreaseCart(ctx context.Context, id uint, qty int) error {
+func (s *CartService) DecreaseCart(ctx context.Context, id uint, qty int) error {
 	err := s.repository.UpdateQuantity(ctx, id, "decrease", qty)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func (s *QuantityService) DecreaseCart(ctx context.Context, id uint, qty int) er
 	return nil
 }
 
-func (s *QuantityService) CalculatePrice(ctx context.Context, userID uint, status string) (*entity.CalculateCart, error) {
+func (s *CartService) CalculatePrice(ctx context.Context, userID uint, status string) (*entity.CalculateCart, error) {
 	carts, err := s.repository.GetManyByUserAndStatus(ctx, userID, status)
 	if err != nil {
 		return nil, err
@@ -48,4 +48,12 @@ func (s *QuantityService) CalculatePrice(ctx context.Context, userID uint, statu
 		TotalQuantity: totalQuantity,
 		TotalPrice:    float64(totalPrice),
 	}, nil
+}
+
+func (s *CartService) UpdateOrderIDInPendingCarts(ctx context.Context, userID uint, orderID uint) error {
+	err := s.repository.UpdateOrderIDByStatus(ctx, userID, orderID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
