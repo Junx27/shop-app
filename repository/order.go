@@ -31,6 +31,13 @@ func (r *OrderRepository) GetMany(ctx context.Context, page, limit int) ([]*enti
 
 	return orders, totalItems, nil
 }
+func (r *OrderRepository) GetManyByStatus(ctx context.Context, status string) ([]*entity.Order, error) {
+	var orders []*entity.Order
+	if err := r.db.Where("status = ?", status).Find(&orders).Error; err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
 
 func (r *OrderRepository) CreateOne(ctx context.Context, order *entity.Order) (*entity.Order, error) {
 	if err := r.db.WithContext(ctx).Create(order).Error; err != nil {
@@ -38,4 +45,21 @@ func (r *OrderRepository) CreateOne(ctx context.Context, order *entity.Order) (*
 	}
 
 	return order, nil
+}
+
+func (r *OrderRepository) UpdatePayment(ctx context.Context, id uint) (*entity.Order, error) {
+	order := &entity.Order{}
+	if res := r.db.Model(order).Where("id = ?", id).First(order); res.Error != nil {
+		return nil, res.Error
+	}
+
+	order.Payment = true
+	order.Status = "success"
+
+	if err := r.db.Save(order).Error; err != nil {
+		return nil, err
+	}
+
+	return order, nil
+
 }

@@ -78,3 +78,19 @@ func (h *OrderHandler) CreateOne(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusCreated, helper.SuccessResponse("Create data successfully", createOrder))
 }
+
+func (h *OrderHandler) UpdatePayment(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
+		return
+	}
+
+	updatedOrder, err := h.repository.UpdatePayment(ctx, uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to update data"))
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, helper.SuccessResponse("Update data successfully", updatedOrder))
+}

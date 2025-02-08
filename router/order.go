@@ -18,5 +18,6 @@ func SetupOrderRouter(r *gin.Engine, db *gorm.DB, cartService *service.CartServi
 	{
 		orderGroup.GET("", orderHandler.GetMany)
 		orderGroup.POST("", orderHandler.CreateOne)
+		orderGroup.PATCH("/payment/:id", orderHandler.UpdatePayment)
 	}
 }
