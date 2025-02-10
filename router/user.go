@@ -15,6 +15,6 @@ func SetupUserRouter(r *gin.Engine, db *gorm.DB) {
 	userGroup := r.Group("/users")
 	userGroup.Use(middleware.AuthProtected(db))
 	{
-		userGroup.GET("/", userHandler.GetMany)
+		userGroup.GET("/", middleware.RoleRequired("admin"), userHandler.GetMany)
 	}
 }

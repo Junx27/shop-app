@@ -10,11 +10,12 @@ import (
 )
 
 func SetupOrderRouter(r *gin.Engine, db *gorm.DB, cartService *service.CartService) {
-	OrderRepository := repository.NewOrderRepository(db)
-	orderHandler := controller.NewOrderHandler(OrderRepository, cartService)
+	orderRepository := repository.NewOrderRepository(db)
+	orderHandler := controller.NewOrderHandler(orderRepository, cartService)
+	orderMiddleware := orderRepository.(*repository.OrderRepository)
 
 	orderGroup := r.Group("/orders")
-	orderGroup.Use(middleware.AuthProtected(db))
+	orderGroup.Use(middleware.AuthProtected(db), middleware.AccessPermission(orderMiddleware), middleware.RoleRequired("user"))
 	{
 		orderGroup.GET("", orderHandler.GetMany)
 		orderGroup.POST("", orderHandler.CreateOne)

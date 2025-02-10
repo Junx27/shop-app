@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 
 	"strconv"
@@ -23,13 +24,33 @@ func NewCartHandler(repository entity.CartRepository, menuService entity.MenuSer
 }
 
 func (h *CartHandler) GetMany(ctx *gin.Context) {
-	carts, err := h.repository.GetMany(ctx)
+	userID, err := helper.GetUserIDFromCookie(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+		return
+	}
+	page := ctx.DefaultQuery("page", "1")
+	limit := ctx.DefaultQuery("limit", "10")
+
+	pageInt, _ := strconv.Atoi(page)
+	limitInt, _ := strconv.Atoi(limit)
+
+	carts, totalItems, err := h.repository.GetMany(ctx, userID, pageInt, limitInt)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
 	}
+	totalPages := int(math.Ceil(float64(totalItems) / float64(limitInt)))
 
-	ctx.JSON(http.StatusOK, helper.SuccessResponse("Fetch data successfully", carts))
+	if pageInt > totalPages {
+		ctx.JSON(http.StatusNotFound, helper.FailedResponse("Data not found"))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, helper.PaginationResponse("Fetch data successfully", pageInt, limitInt, totalPages, totalItems, carts))
 }
 
 func (h *CartHandler) CalculateTotalPrice(ctx *gin.Context) {

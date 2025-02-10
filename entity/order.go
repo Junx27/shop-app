@@ -25,7 +25,8 @@ type Order struct {
 }
 
 type OrderRepository interface {
-	GetMany(ctx context.Context, page, limit int) ([]*Order, int64, error)
+	GetManyAdmin(ctx context.Context, page, limit int) ([]*Order, int64, error)
+	GetMany(ctx context.Context, userId uint, page, limit int) ([]*Order, int64, error)
 	GetManyByStatus(ctx context.Context, status string) ([]*Order, error)
 	UpdatePayment(ctx context.Context, id uint) (*Order, error)
 	CreateOne(ctx context.Context, order *Order) (*Order, error)

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Junx27/shop-app/entity"
@@ -16,12 +17,46 @@ func NewCartRepository(db *gorm.DB) entity.CartRepository {
 	return &CartRepository{db: db}
 }
 
-func (r *CartRepository) GetMany(ctx context.Context) ([]*entity.Cart, error) {
-	var carts []*entity.Cart
-	if err := r.db.WithContext(ctx).Find(&carts).Error; err != nil {
+func (r *CartRepository) GetUserID(id uint) (uint, error) {
+	var cart entity.Cart
+	if err := r.db.First(&cart, id).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, errors.New("cart not found")
+		}
+		return 0, err
+	}
+	return cart.UserID, nil
+}
+
+func (r *CartRepository) GetManyByUser(ctx context.Context, userID uint, page, limit int) ([]interface{}, error) {
+	carts, _, err := r.GetMany(ctx, userID, page, limit)
+	if err != nil {
 		return nil, err
 	}
-	return carts, nil
+	result := make([]interface{}, len(carts))
+	for i, cart := range carts {
+		result[i] = cart
+	}
+	return result, nil
+}
+
+func (r *CartRepository) GetManyAdmin(ctx context.Context, page, limit int) ([]*entity.Cart, int64, error) {
+	var carts []*entity.Cart
+	var total int64
+	err := r.db.Model(&entity.Cart{}).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&carts).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return carts, total, nil
+}
+func (r *CartRepository) GetMany(ctx context.Context, userId uint, page, limit int) ([]*entity.Cart, int64, error) {
+	var carts []*entity.Cart
+	var total int64
+	err := r.db.Model(&entity.Cart{}).Where("user_id = ?", userId).Count(&total).Offset((page - 1) * limit).Limit(limit).Find(&carts).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return carts, total, nil
 }
 
 func (r *CartRepository) GetOne(ctx context.Context, id uint) (*entity.Cart, error) {

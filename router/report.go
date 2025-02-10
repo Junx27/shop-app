@@ -9,11 +9,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupReportRouter(r *gin.Engine, db *gorm.DB, orderService *service.OrderService, orderRepo entity.OrderRepository) {
-	reportHandler := controller.NewReportHandler(orderRepo, orderService)
+func SetupReportRouter(r *gin.Engine, db *gorm.DB, orderService *service.OrderService, orderRepo entity.OrderRepository, cartRepo entity.CartRepository) {
+	reportHandler := controller.NewReportHandler(orderRepo, cartRepo, orderService)
 	reportGroup := r.Group("/reports")
-	reportGroup.Use(middleware.AuthProtected(db))
+	reportGroup.Use(middleware.AuthProtected(db), middleware.RoleRequired("admin"))
 	{
-		reportGroup.GET("", middleware.RoleRequired("admin"), reportHandler.SumaryReport)
+		reportGroup.GET("/carts", reportHandler.GetManyCart)
+		reportGroup.GET("/orders", reportHandler.GetManyOrder)
+		reportGroup.GET("", reportHandler.SumaryReport)
 	}
 }

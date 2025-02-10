@@ -40,7 +40,8 @@ func (cart *Cart) BeforeSave(tx *gorm.DB) (err error) {
 }
 
 type CartRepository interface {
-	GetMany(ctx context.Context) ([]*Cart, error)
+	GetManyAdmin(ctx context.Context, page, limit int) ([]*Cart, int64, error)
+	GetMany(ctx context.Context, userId uint, page, limit int) ([]*Cart, int64, error)
 	GetOne(ctx context.Context, id uint) (*Cart, error)
 	CreateOne(ctx context.Context, cart *Cart) (*Cart, error)
 	UpdateQuantity(ctx context.Context, id uint, operation string, qty int) error

@@ -12,9 +12,10 @@ import (
 func SetupCartRouter(r *gin.Engine, db *gorm.DB, menuService *service.MenuService, cartService *service.CartService) {
 	cartRepository := repository.NewCartRepository(db)
 	cartHandler := controller.NewCartHandler(cartRepository, menuService, cartService)
+	cartMiddleware := cartRepository.(*repository.CartRepository)
 
 	cartGroup := r.Group("/cart")
-	cartGroup.Use(middleware.AuthProtected(db))
+	cartGroup.Use(middleware.AuthProtected(db), middleware.AccessPermission(cartMiddleware), middleware.RoleRequired("user"))
 	{
 		cartGroup.GET("", cartHandler.GetMany)
 		cartGroup.GET("/:id", cartHandler.GetOne)

@@ -26,7 +26,7 @@ func main() {
 	router.SetupMenuRouter(r, db)
 	router.SetupCartRouter(r, db, menuService.(*service.MenuService), cartService.(*service.CartService))
 	router.SetupOrderRouter(r, db, cartService.(*service.CartService))
-	router.SetupReportRouter(r, db, orderService.(*service.OrderService), orderRepository)
+	router.SetupReportRouter(r, db, orderService.(*service.OrderService), orderRepository, cartRepository)
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"App Name": "Shop App",

@@ -41,17 +41,10 @@ func (h *MenuHandler) GetMany(ctx *gin.Context) {
 	totalPages := int(math.Ceil(float64(totalItems) / float64(limitInt)))
 
 	if pageInt > totalPages {
-		pageInt = totalPages
-		menus, _, err = h.repository.GetMany(ctx, pageInt, limitInt, nameFilter, categoryFilter)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
-			return
-		}
-		ctx.JSON(http.StatusBadRequest, helper.FailedResponse("Page not found"))
+		ctx.JSON(http.StatusNotFound, helper.FailedResponse("Data not found"))
 		return
 	}
-	response := helper.PaginationResponse(menus, pageInt, limitInt, totalPages, totalItems)
-	ctx.JSON(http.StatusOK, helper.SuccessResponse(("Fetch data successfully"), response))
+	ctx.JSON(http.StatusOK, helper.PaginationResponse("Fetch data successfully", pageInt, limitInt, totalPages, totalItems, menus))
 }
 
 func (h *MenuHandler) GetOne(ctx *gin.Context) {
