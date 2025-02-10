@@ -1,6 +1,10 @@
 package entity
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 type UserRole string
 
@@ -33,7 +37,7 @@ type UserResponse struct {
 }
 
 type UserReopository interface {
-	GetMany() ([]*User, error)
+	GetMany(ctx context.Context, page, limit int) ([]*User, int64, error)
 }
 
 func (u *User) AfterCreate(db *gorm.DB) (err error) {

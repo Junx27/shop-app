@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/Junx27/shop-app/entity"
+	"github.com/Junx27/shop-app/helper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,11 +19,22 @@ func NewUserHandler(repository entity.UserReopository) *UserHandler {
 }
 
 func (h *UserHandler) GetMany(ctx *gin.Context) {
-	users, err := h.repository.GetMany()
+	page := ctx.DefaultQuery("page", "1")
+	limit := ctx.DefaultQuery("limit", "10")
+
+	pageInt, _ := strconv.Atoi(page)
+	limitInt, _ := strconv.Atoi(limit)
+
+	users, totalItems, err := h.repository.GetMany(ctx, pageInt, limitInt)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to fetch data"))
 		return
 	}
+	totalPages := int(math.Ceil(float64(totalItems) / float64(limitInt)))
 
-	ctx.JSON(http.StatusOK, gin.H{"data": users})
+	if pageInt > totalPages {
+		ctx.JSON(http.StatusNotFound, helper.FailedResponse("Data not found"))
+		return
+	}
+	ctx.JSON(http.StatusOK, helper.PaginationResponse("Fetch data successfully", pageInt, limitInt, totalPages, totalItems, users))
 }
