@@ -134,6 +134,7 @@ func (h *CartHandler) CreateOne(ctx *gin.Context) {
 	}
 	cart.UserID = userID
 	cart.Subtotal = subTotal
+	cart.Price = float64(subTotal) / float64(cart.Quantity)
 	createCart, err := h.repository.CreateOne(ctx, cart)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to create data"))

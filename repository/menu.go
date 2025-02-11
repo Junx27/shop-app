@@ -22,7 +22,7 @@ func (r *MenuRepository) GetMany(ctx context.Context, page, limit int, nameFilte
 	query := r.db.Model(&entity.Menu{})
 
 	if nameFilter != "" {
-		query = query.Where("title LIKE ?", "%"+nameFilter+"%")
+		query = query.Where("name LIKE ?", "%"+nameFilter+"%")
 	}
 
 	if categoryFilter != "" {

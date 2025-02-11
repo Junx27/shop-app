@@ -20,16 +20,17 @@ type CalculateCart struct {
 
 type Cart struct {
 	BaseModelCart
-	ID       uint   `json:"id" gorm:"primaryKey"`
-	UserID   uint   `json:"user_id"`
-	MenuID   uint   `json:"menu_id"`
-	OrderID  *uint  `json:"order_id"`
-	Quantity int    `json:"quantity" gorm:"not null"`
-	Subtotal int    `json:"subtotal" gorm:"not null"`
-	Status   string `json:"status" gorm:"default:pending"`
-	Menu     Menu   `json:"-" gorm:"foreignKey:MenuID;constraint:OnDelete:CASCADE"`
-	User     User   `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-	Order    Order  `json:"-" gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE"`
+	ID       uint    `json:"id" gorm:"primaryKey"`
+	UserID   uint    `json:"user_id"`
+	MenuID   uint    `json:"menu_id"`
+	OrderID  *uint   `json:"order_id"`
+	Price    float64 `json:"price"`
+	Quantity int     `json:"quantity" gorm:"not null"`
+	Subtotal int     `json:"subtotal" gorm:"not null"`
+	Status   string  `json:"status" gorm:"default:pending"`
+	Menu     Menu    `json:"-" gorm:"foreignKey:MenuID;constraint:OnDelete:CASCADE"`
+	User     User    `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	Order    Order   `json:"-" gorm:"foreignKey:OrderID;constraint:OnDelete:CASCADE"`
 }
 
 func (cart *Cart) BeforeSave(tx *gorm.DB) (err error) {

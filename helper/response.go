@@ -104,7 +104,7 @@ func (ResponseMessage) LoginSuccessfully() string {
 func (ResponseMessage) RegisterFailed() Response {
 	return Response{
 		Success: false,
-		Message: "Please check email is valid and password minimum 8 character must contain at least one uppercase letter, one number, and one symbol",
+		Message: "Register Failed already exist",
 	}
 }
 func (ResponseMessage) RegisterFailedEntity() Response {

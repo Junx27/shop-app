@@ -136,6 +136,14 @@ func (r *CartRepository) UpdateQuantity(ctx context.Context, id uint, operation 
 	default:
 		return fmt.Errorf("invalid operation, use 'increase' or 'decrease'")
 	}
+
+	cart.Subtotal = int(float64(cart.Quantity) * float64(cart.Price))
+	if cart.Quantity == 0 {
+		if err := r.db.Delete(&cart).Error; err != nil {
+			return fmt.Errorf("failed to delete cart: %v", err)
+		}
+		return nil
+	}
 	if err := r.db.Save(&cart).Error; err != nil {
 		return err
 	}
